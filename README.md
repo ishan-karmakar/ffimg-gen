@@ -31,3 +31,4 @@ $ ffimg-gen spec.yaml
 ```
 
 # How it works
+`ffimg-gen` works by using linear interpolation to approximate the size of the box relative to the other boxes. This is a complicated task, as it has to manage making sure the text can fit, as well as making sure an extremely large sized field (ex. 1MB) doesn't completely take over a smaller field (4B). It does this by having a threshold where any size under it will be linearly scaled to the size of the block, and any size over it will be linearly interpolated between the threshold and the maximum sized block.
