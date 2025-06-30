@@ -99,41 +99,45 @@ def resolution(value):
         raise ValueError
     return tuple(int(x) for x in value.split("x"))
 
-bitmath.format_plural = True
-bitmath.format_string = "{value:.0f} {unit}"
+def main():
+    bitmath.format_plural = True
+    bitmath.format_string = "{value:.0f} {unit}"
 
-parser = argparse.ArgumentParser(
-    prog = "ffimg-gen",
-    description = "A utility to create images describing a file format from a YAML spec file"
-)
-parser.add_argument("filename", help="Filename of the YAML spec file")
-parser.add_argument("-o", "--output", default="output.png", help="Filename of the output image")
-parser.add_argument("-r", "--resolution", default="1920x1080", type=resolution, help="Resolution of the output image in the format ___x___ (1280x720)")
-args = parser.parse_args()
+    parser = argparse.ArgumentParser(
+        prog = "ffimg-gen",
+        description = "A utility to create images describing a file format from a YAML spec file"
+    )
+    parser.add_argument("filename", help="Filename of the YAML spec file")
+    parser.add_argument("-o", "--output", default="output.png", help="Filename of the output image")
+    parser.add_argument("-r", "--resolution", default="1920x1080", type=resolution, help="Resolution of the output image in the format ___x___ (1280x720)")
+    args = parser.parse_args()
 
-PADDING = args.resolution[0] / 100
-USABLE_WIDTH = args.resolution[0] - PADDING * 2
-USABLE_HEIGHT = args.resolution[1] - PADDING * 2
+    PADDING = args.resolution[0] / 100
+    USABLE_WIDTH = args.resolution[0] - PADDING * 2
+    USABLE_HEIGHT = args.resolution[1] - PADDING * 2
 
-"""
-width = field_size * BYTE_SIZE
-widths below WIDTH_THRESHOLD will be used directly
-widths above WIDTH_THRESHOLD will scale linearly to max_width
-"""
-WIDTH_THRESHOLD = USABLE_WIDTH / 2
+    """
+    width = field_size * BYTE_SIZE
+    widths below WIDTH_THRESHOLD will be used directly
+    widths above WIDTH_THRESHOLD will scale linearly to max_width
+    """
+    WIDTH_THRESHOLD = USABLE_WIDTH / 2
 
-with open(args.filename) as file:
-    spec = yaml.safe_load(file)
-image = Image.new("RGB", args.resolution, "white")
-draw = ImageDraw.Draw(image)
+    with open(args.filename) as file:
+        spec = yaml.safe_load(file)
+    image = Image.new("RGB", args.resolution, "white")
+    draw = ImageDraw.Draw(image)
 
-sizes = []
-for category in spec:
-    for field in category["fields"]:
-        field["size"] = bitmath.parse_string(field["size"])
-        sizes.append(field["size"].bytes)
-BYTE_WIDTH = calculate_byte_width(np.array(sizes))
-ROW_HEIGHT, FONT_SIZE = estimate_layout(spec, draw)
-MAX_SIZE = max(field["size"] for category in spec for field in category["fields"])
-draw_layout(spec, draw)
-image.save(args.output)
+    sizes = []
+    for category in spec:
+        for field in category["fields"]:
+            field["size"] = bitmath.parse_string(field["size"])
+            sizes.append(field["size"].bytes)
+    BYTE_WIDTH = calculate_byte_width(np.array(sizes))
+    ROW_HEIGHT, FONT_SIZE = estimate_layout(spec, draw)
+    MAX_SIZE = max(field["size"] for category in spec for field in category["fields"])
+    draw_layout(spec, draw)
+    image.save(args.output)
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ffimg-gen"
+license = "MIT"
+description = "A utility to create images describing a file format from a YAML spec file"
+version = "0.0.1"
+authors = [{ name = "Ishan Karmakar", email = "ishan.karmakar24@gmail.com" }]
+readme = "README.md"
+dependencies = ["numpy", "pillow", "bitmath", "pyyaml"]
+requires-python = ">=3.7"
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"Operating System :: OS Independent",
+	"Programming Language :: Python",
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 3.7",
+	"Programming Language :: Python :: 3.8",
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13"
+]
+
+[project.scripts]
+ffimg-gen = "ffimg_gen.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/ishan-karmakar/ffimg-gen"
+Issues = "https://github.com/ishan-karmakar/ffimg-gen/issues"
