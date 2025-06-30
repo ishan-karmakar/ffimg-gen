@@ -7,6 +7,7 @@ This is a utility to create file format images from a YAML specification.
 ```bash
 $ pip install ffimg-gen
 $ ffimg-gen ...
+$ python3 -m ffimg-gen ...
 ```
 
 # Usage
