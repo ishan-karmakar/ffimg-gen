@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw
 import bitmath, yaml, re, argparse
 import numpy as np
 
-def get_width(size: bitmath.Bitmath, text_size: int):
+def get_width(size: bitmath.Bitmath, text_size: float):
     width = size.bytes * BYTE_WIDTH
     if width > WIDTH_THRESHOLD:
         width = np.interp(
@@ -30,9 +30,13 @@ def draw_blocks(draw: ImageDraw.ImageDraw, blocks: list, y):
             font_size=FONT_SIZE,
             fill="black"
         )
+        if type(block[1]["size"]) == int:
+            size_str = ""
+        else:
+            size_str = str(block[1]["size"])
         draw.text(
             (x + block[0] / 2, y + ROW_HEIGHT / 2),
-            str(block[1]["size"]),
+            size_str,
             anchor="ma",
             font_size=FONT_SIZE,
             fill="black"
@@ -48,10 +52,16 @@ def estimate_layout(spec, draw: ImageDraw.ImageDraw, max_iterations=10):
 
         for category in spec:
             for field in category["fields"]:
-                width = get_width(
-                    field["size"],
-                    draw.textlength(max(field["name"], str(field["size"]), key=len), font_size=font_size)
-                )
+                if type(field["size"]) == int:
+                    width = get_width(
+                        bitmath.Byte(field["size"]),
+                        draw.textlength(field["name"], font_size=font_size)
+                    )
+                else:
+                    width = get_width(
+                        field["size"],
+                        draw.textlength(max(field["name"], str(field["size"]), key=len), font_size=font_size)
+                    )
 
                 if x + width > PADDING + USABLE_WIDTH:
                     rows += 1
@@ -70,13 +80,18 @@ def draw_layout(spec, draw: ImageDraw.ImageDraw):
     blocks = []
     for category in spec:
         for field in category["fields"]:
-            width = get_width(
-                field["size"],
-                draw.textlength(max(field["name"], str(field["size"]), key=len), font_size=FONT_SIZE)
-            )
+            if type(field["size"]) == int:
+                width = get_width(
+                    bitmath.Byte(field["size"]),
+                    draw.textlength(field["name"], font_size=FONT_SIZE)
+                )
+            else:
+                width = get_width(
+                    field["size"],
+                    draw.textlength(max(field["name"], str(field["size"]), key=len), font_size=FONT_SIZE)
+                )
             if x + width > PADDING + USABLE_WIDTH:
                 draw_blocks(draw, blocks, y)
-                rows += 1
                 y += ROW_HEIGHT + PADDING
                 x = PADDING
                 blocks.clear()
@@ -100,6 +115,8 @@ def resolution(value):
     return tuple(int(x) for x in value.split("x"))
 
 def main():
+    global USABLE_WIDTH, USABLE_HEIGHT, WIDTH_THRESHOLD, PADDING, BYTE_WIDTH, FONT_SIZE, ROW_HEIGHT, MAX_SIZE
+
     bitmath.format_plural = True
     bitmath.format_string = "{value:.0f} {unit}"
 
@@ -131,11 +148,17 @@ def main():
     sizes = []
     for category in spec:
         for field in category["fields"]:
-            field["size"] = bitmath.parse_string(field["size"])
-            sizes.append(field["size"].bytes)
+            if "size" in field:
+                field["size"] = bitmath.parse_string(field["size"])
+                sizes.append(field["size"].bytes)
+    median = round(np.median(sizes))
+    for category in spec:
+        for field in category["fields"]:
+            if "size" not in field:
+                field["size"] = median
     BYTE_WIDTH = calculate_byte_width(np.array(sizes))
-    ROW_HEIGHT, FONT_SIZE = estimate_layout(spec, draw)
     MAX_SIZE = max(field["size"] for category in spec for field in category["fields"])
+    ROW_HEIGHT, FONT_SIZE = estimate_layout(spec, draw)
     draw_layout(spec, draw)
     image.save(args.output)
 

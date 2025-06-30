@@ -1,0 +1,31 @@
+- fields:
+  - size: 4B
+    name: Version
+  - size: 4B
+    name: IHL
+  - size: 6B
+    name: DSCP
+  - size: 2B
+    name: ECN
+  - size: 16B
+    name: Total Length
+  - size: 16B
+    name: Identification
+  - size: 3B
+    name: Flags
+  - size: 13B
+    name: Fragment Offset
+  - size: 8B
+    name: TTL
+  - size: 8B
+    name: Protocol
+  - size: 16B
+    name: Header Checksum
+  - size: 64B
+    name: Source Address
+  - size: 64B
+    name: Destination Address
+  - size: 320B
+    name: Options
+- fields:
+  - name: Data

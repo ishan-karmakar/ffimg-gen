@@ -1,0 +1,25 @@
+- fields:
+  - size: 6B
+    name: Signature
+  - size: 2B
+    name: Version
+  - size: 4B
+    name: Extra Header Length
+  - name: Extra Header
+- fields:
+  - size: 2b
+    name: Entry ID Length
+  - size: 2b
+    name: Payload Size Length
+  - size: 3b
+    name: Timestamp Length
+  - size: 1b
+    name: Reserved
+- fields:
+  - size: 4B
+    name: Entry ID
+  - size: 4B
+    name: Payload Size
+  - size: 8B
+    name: Timestamp
+  - name: Payload
