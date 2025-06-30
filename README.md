@@ -2,6 +2,11 @@
 This is a utility to create file format images from a YAML specification.
 
 # Examples of Results
+[IP Packet](https://en.wikipedia.org/wiki/File:IPv4_Packet-en.svg) Structure:
+![IP Packet Structure](examples/ip.png)
+
+[WPILog](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc) Structure:
+![WPILog Packet Structure](examples/wpilog.png)
 
 # Install
 ```bash
